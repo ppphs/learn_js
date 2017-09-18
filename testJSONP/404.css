@@ -1,0 +1,11 @@
+html {
+      height: 100%;
+    }
+
+body {
+  background: url('./server/404.png') no-repeat center;
+}
+
+h1 {
+  color: pink;
+}

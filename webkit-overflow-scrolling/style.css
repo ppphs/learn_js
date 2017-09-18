@@ -1,0 +1,10 @@
+.wrapper {
+  height: 200px;
+  width: 200px;
+  -webkit-overflow-scrolling: touch;
+  padding: 5px;
+  overflow: auto;
+}
+img {
+  display: block;
+}
