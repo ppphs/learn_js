@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta http-equiv="X-UA-Compatible" content="ie=edge">
+  <title>Document</title>
+</head>
+<body>
+  <script type="text/javascript">
+    function createXHR () {
+      if (typeof XMLHttpRequest !== 'undefined') {
+        return new XMLHttpRequest()
+      } else if (typeof ActiveXobject !== 'undefined') { // 针对ie7以下的版本兼容
+        if (typeof arguments.callee.activeXString !== 'string') {
+          let versions = ['MSXML2.XMLHttp.6.0', 'MSXML2.XMLHttp.3.0', 'MSXML2.XMLHttp'],
+            i, len
+          
+          for (i = 0, len = versions.length; i < len; i++) {
+            try {
+              new ActiveXObject(versions[i])
+              arguments.callee.activeXString = versions[i]
+              break
+            } catch (e) {
+            }
+          }
+          return new ActiveXObject(arguments.callee.activeXString)
+        } else {
+          throw new Error('对不起您的浏览器不支持ajax')
+        }
+      }
+    }
+
+    let xhr = createXHR()
+    /*
+      xhr.readyState === 0 // 这是尚未调用open()方法
+      xhr.readyState === 1 // 已经调用open()但是未调用send()方法
+      xhr.readyState === 2 // 已经调用send()方法但是未收到响应
+      xhr.readyState === 3 // 已经接收到了部分的响应数据
+      xhr.readyState === 4 // 已经接收到全部响应数据，而且已经可以在客户端使用了
+    */
+    xhr.onreadystatechange = () => { // 这个必须在xhr.open()之前指定才能确保跨浏览器的兼容性
+      if (xhr.readyState === 4) {
+        if ((xhr.status >= 200 && xhr.status < 300) || xhr.status === 304) {
+          alert(xhr.responseText)
+        } else {
+          alert(`Request was unsuccessful: ${xhr.status}`)
+        }
+      }
+    }
+    /* GET请求 */
+    // xhr.open("get", "localhost:8080/#/", true) // 启动一个请求以备发送
+
+    // xhr.setRequestHeader('MyHeader', 'MyValue') // 设置自定义的http请求头，必须在open()之后send()之前
+
+    // xhr.send(null) // 请求被分派到服务器
+
+    // xhr.abort() // 可以取消异步请求
+
+    /* POST请求 提交表单 XMLHttpRequest2级*/
+    let data = new FormData(document.forms[0]) // FormData这个是XMLHttpRequest2级为了方便序列化表单的对象
+    xhr.open("post", "localhost:8080/#/", true)
+    xhr.send(data)
+  </script>
+</body>
+</html>

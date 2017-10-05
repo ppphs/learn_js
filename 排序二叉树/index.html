@@ -1,0 +1,180 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta http-equiv="X-UA-Compatible" content="ie=edge">
+  <title>Document</title>
+</head>
+<body>
+  <script type="text/javascript">
+    function BinaryTree () {
+      let Node = function (key) { // 二叉树构造函数
+        this.key = key
+        this.left = null
+        this.right = null
+      }
+      let root = null // 根节点
+
+      let insertNode = (node, newNode) => { // 插入二叉树节点的左右节点
+        if (newNode.key < node.key) {
+          if (node.left === null) {
+            node.left = newNode
+          } else {
+            insertNode(node.left, newNode)
+          }
+        } else {
+          if (node.right === null) {
+            node.right = newNode
+          } else {
+            insertNode(node.right, newNode)
+          }
+        }
+      }
+
+      this.insert = (key) => { // 插入二叉树
+        let newNode = new Node(key)
+        if (root === null) {
+          root = newNode
+        } else {
+          insertNode(root, newNode)
+        }
+      }
+
+      let inOrderTraverseNode = (node, callback) => { // 中序遍历
+        if (node !== null) {
+          inOrderTraverseNode(node.left, callback)
+          callback(node.key)
+          inOrderTraverseNode(node.right, callback)
+        }
+      }
+
+      let preOrderTraverseNode = (node, callback) => { // 先序遍历
+        if (node !== null) {
+          callback(node.key)
+          preOrderTraverseNode(node.left, callback)
+          preOrderTraverseNode(node.right, callback)
+        }
+      }
+
+      let afterOrderTraverseNode = (node, callback) => { // 后序遍历
+        if (node !== null) {
+          preOrderTraverseNode(node.left, callback)
+          preOrderTraverseNode(node.right, callback)
+          callback(node.key)
+        }
+      }
+
+      let minNode = (node) => { // 找出最小值
+        if (node) {
+          while (node && node.left !== null) {
+            node = node.left
+          }
+          return node
+        }
+
+        return null
+      }
+
+      let maxNode = (node) => { // 找出最大值
+        if (node) {
+          while (node && node.right !== null) {
+            node = node
+          }
+          return node.key
+        }
+      }
+
+      let search = (node, key) => { // 查找树里面的值
+        if (node === null) {
+          return false
+        }
+        if (key < node.key) {
+          return search(node.left, key)
+        } else if (key > node.key) {
+          return search(node.right, key)
+        } else if (key === node.key) {
+          return true
+        }
+      }
+
+      let remove = (node, key) => {
+        if (node === null) { // 没找到节点
+          return null
+        }
+        if (key < node.key) {
+          node.left = remove(node.left, key)
+          return node
+        } else if (key > node.key) {
+          node.right = remove(node.right, key)
+          return node
+        } else {
+          if (node.left === null && node.right === null) {
+            node = null
+            return node
+          } else if (node.left === null) { // 左子树为空
+            node = node.left
+            return node
+          } else if (node.right === null) { // 右子树为空
+            node = node.right
+            return node
+          } else if (node.left !== null && node.right !==null) { // 左右都不为空
+            var tempMinNode = minNode(node.right)
+            node.key = tempMinNode.key
+            node.right = remove(node.right, tempMinNode.key)
+            return node
+          }
+        }
+      }
+
+      this.inOrderTraverseNode = () => {
+        inOrderTraverseNode(root, callback)
+      }
+
+      this.preOrderTraverseNode = () => {
+        preOrderTraverseNode(root, callback)
+      }
+
+      this.afterOrderTraverseNode = () => {
+        afterOrderTraverseNode(root, callback)
+      }
+
+      this.min = () => {
+        return minNode(root).key
+      }
+
+      this.max = () => {
+        return maxNode(root).key
+      }
+
+      this.search = (key) => {
+        return search(root, key)
+      }
+
+      this.remove = (key) => {
+        return remove(root, key)
+      }
+    }
+
+    let binaryTree = new BinaryTree()
+    let arr = [8, 3, 10, 1, 6, 14, 4, 7, 13]
+
+    arr.forEach((item) => {
+      binaryTree.insert(item)
+    })
+
+    function callback (key) {
+      console.log(key)
+    }
+
+    // binaryTree.inOrderTraverseNode()
+    binaryTree.preOrderTraverseNode()
+
+    console.log(`最小的节点为：${binaryTree.min()}`)
+    console.log(`最大的节点为：${binaryTree.max()}`)
+
+    console.log(`7在这颗树里面吗?  ${binaryTree.search(7)}`)
+    console.log(`2在这颗树里面吗?  ${binaryTree.search(2)}`)
+  </script>
+</body>
+</html>
