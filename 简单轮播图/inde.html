@@ -133,6 +133,7 @@
       let next = document.querySelector('#next')
       let index = 1
       let moveFlage = true // 前进后退没完成时只能点击一次
+      let intervalId = null
 
       let go = (() => {
         let distance = null
@@ -217,6 +218,26 @@
           }
         })(item), false)
       }
+
+      intervalId = setInterval(() => {
+        go(-1024)
+        index++
+        highlightPoint()
+      }, 2000)
+      container.addEventListener('mouseenter', () => {
+        window.clearInterval(intervalId)
+      }, false)
+      container.addEventListener('mouseout', () => {
+        if (intervalId) { // 要清理上一次的定时器，去抖动
+          window.clearInterval(intervalId)
+        }
+        intervalId = setInterval(() => {
+          go(-1024)
+          index++
+          highlightPoint()
+        }, 2000)
+      }, false)
+
     }
   </script>
 </body>
