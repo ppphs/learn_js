@@ -121,8 +121,10 @@
       <span data-index="3"></span>
       <span data-index="4"></span>
     </div>
-    <a href="javascript: void(0);" class="skip" id="prev"><i class="iconfont icon-back"></i></a>
-    <a href="javascript: void(0);" class="skip" id="next"><i class="iconfont icon-more"></i></a>
+    <div class="skip_btn">
+      <a href="javascript: void(0);" class="skip" id="prev"><i class="iconfont icon-back"></i></a>
+      <a href="javascript: void(0);" class="skip" id="next"><i class="iconfont icon-more"></i></a>
+    </div>
   </div>
   <script>
     window.onload = () => {
@@ -139,13 +141,14 @@
         let distance = null
         let totalTime = 300
         let newLeft = null
+        let onceMove = null
         return (dis) => { // 因为requestAnimationFrame传递给回调的是一个时间戳所以要用闭包保存一个目标距离
           if (distance === null) {
             distance = dis
             newLeft = parseInt(content.style.left) + distance
+            onceMove = distance / (totalTime / (1000 / 60)) // requestAnimationFrame 1秒调用60次，这里计算出一次移动的距离
           }
           let left = parseInt(content.style.left)
-          let onceMove = distance / (totalTime / (1000 / 60)) // requestAnimationFrame 1秒调用60次，这里计算出一次移动的距离
           let currentPosition = left + onceMove
           content.style.left = currentPosition + 'px'
           if (distance < 0 && currentPosition > newLeft) {
@@ -227,7 +230,7 @@
       container.addEventListener('mouseenter', () => {
         window.clearInterval(intervalId)
       }, false)
-      container.addEventListener('mouseout', () => {
+      container.addEventListener('mouseout', function (e) {
         if (intervalId) { // 要清理上一次的定时器，去抖动
           window.clearInterval(intervalId)
         }
@@ -238,6 +241,21 @@
         }, 2000)
       }, false)
 
+      let skip_btn = document.querySelector('.skip_btn') // 修复当鼠标进入前进后退时还会自动播放
+      skip_btn.addEventListener('mouseenter', () => {
+        window.clearInterval(intervalId)
+      }, false)
+      skip_btn.addEventListener('mouseout', (e) => {
+        e.stopPropagation()
+      }, false)
+
+      let point_wrapper = document.querySelector('.point') // 修复当鼠标进入小点时还会自动播放
+      point_wrapper.addEventListener('mouseenter', () => {
+        window.clearInterval(intervalId)
+      }, false)
+      point_wrapper.addEventListener('mouseout', (e) => {
+        e.stopPropagation()
+      }, false)
     }
   </script>
 </body>
