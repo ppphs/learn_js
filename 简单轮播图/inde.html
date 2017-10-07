@@ -1,0 +1,223 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta http-equiv="X-UA-Compatible" content="ie=edge">
+  <title>Simple Carousel</title>
+  <link rel="stylesheet" href="./fonts/iconfont.css">
+  <style>
+    .clearfix:before, .clearfix:after {
+      content: "  ";
+      display: table;
+    }
+    .clearfix:after {
+      clear: both;
+    }
+
+    .container {
+      position: relative;
+      width: 1024px;
+      height: 768px;
+      overflow: hidden;
+      margin: 0 auto;
+    }
+    .container:hover .skip {
+     display: block;
+    }
+
+    .content {
+      display: flex;
+      position: absolute;
+      flex-wrap: nowrap;
+    }
+
+    .item {
+      flex: 0 0 1024px;
+      width: 1024px;
+    }
+    .item img {
+      width: 1024px;
+      height: 768px;
+    }
+
+    .point {
+      position: absolute;
+      bottom: 5%;
+      left: 50%;
+      transform: translateX(-50%);
+    }
+    .point span{
+      width: 10px;
+      height: 10px;
+      float: left;
+      margin-right: 7px;
+      border-radius: 50%;
+      background-color: rgba(255, 255, 255, 0.26);
+      cursor: pointer;
+    }
+    .point span:last-child{
+      margin-right: 0;
+    }
+    .point span.on {
+      background-color: rgba(255, 255, 255, 0.62)
+    }
+
+    .skip {
+      position: absolute;
+      display: none;
+      top: 50%;
+      transform: translateY(-50%);
+      height: 40px;
+      width: 40px;
+      text-align: center;
+      line-height: 40px;
+      background: rgba(0, 0, 0, .3);
+      opacity: 0.5;
+      color: #fff;
+      text-decoration: none;
+      cursor: pointer;
+    }
+    .icon-back, .icon-more {
+      font-size: 30px;
+    }
+    .skip#prev {
+      left: 30px;
+    }
+    .skip#next {
+      right: 30px;
+    }
+    .skip:hover {
+      opacity: 1;
+    }
+
+  </style>
+</head>
+<body>
+  <div class="container">
+    <div class="content" style="left: -1024px;">
+      <div class="item">
+        <img src="./image/4.jpg" alt="dog">
+      </div>
+      <div class="item">
+        <img src="./image/1.jpg" alt="dog">
+      </div>
+      <div class="item">
+        <img src="./image/2.jpg" alt="dog">
+      </div>
+      <div class="item">
+        <img src="./image/3.jpg" alt="dog">
+      </div>
+      <div class="item">
+        <img src="./image/4.jpg" alt="dog">
+      </div>
+      <div class="item">
+        <img src="./image/1.jpg" alt="dog">
+      </div>
+    </div>
+    <div class="point clearfix">
+      <span data-index="1" class="on"></span>
+      <span data-index="2"></span>
+      <span data-index="3"></span>
+      <span data-index="4"></span>
+    </div>
+    <a href="javascript: void(0);" class="skip" id="prev"><i class="iconfont icon-back"></i></a>
+    <a href="javascript: void(0);" class="skip" id="next"><i class="iconfont icon-more"></i></a>
+  </div>
+  <script>
+    window.onload = () => {
+      let container = document.querySelector('.container')
+      let content = document.querySelector('.content')
+      let points = document.querySelector('.point').getElementsByTagName('span')
+      let prev = document.querySelector('#prev')
+      let next = document.querySelector('#next')
+      let index = 1
+      let moveFlage = true // 前进后退没完成时只能点击一次
+
+      let go = (() => {
+        let distance = null
+        let totalTime = 300
+        let newLeft = null
+        return (dis) => { // 因为requestAnimationFrame传递给回调的是一个时间戳所以要用闭包保存一个目标距离
+          if (distance === null) {
+            distance = dis
+            newLeft = parseInt(content.style.left) + distance
+          }
+          let left = parseInt(content.style.left)
+          let onceMove = distance / (totalTime / (1000 / 60)) // requestAnimationFrame 1秒调用60次，这里计算出一次移动的距离
+          let currentPosition = left + onceMove
+          content.style.left = currentPosition + 'px'
+          if (distance < 0 && currentPosition > newLeft) {
+            window.requestAnimationFrame(go)
+          } else if (distance > 0 && currentPosition < newLeft) {
+            window.requestAnimationFrame(go)
+          } else {
+            content.style.left = newLeft + 'px'
+            if (newLeft >= 0) {
+              content.style.left = -4096 + 'px'
+            } else if (newLeft <= -5120) {
+              content.style.left = -1024 + 'px'
+            }
+            moveFlage = true
+            distance = null
+            return
+          }
+        }
+      })()
+
+      function highlightPoint () {
+        if (index === 0) {
+          index = 4
+        } else if (index === 5) {
+          index = 1
+        }
+        for (let i = 0, len = points.length; i < len; i++) {
+          if (points[i].className === 'on') {
+            points[i].className = ''
+            break
+          }
+        }
+        points[index - 1].className = 'on'
+      }
+
+      next.addEventListener('click', () => {
+        if (moveFlage) {
+          go(-1024)
+          index++
+          highlightPoint()
+          moveFlage = false
+        } else {
+          return
+        }
+      }, false)
+
+      prev.addEventListener('click', () => {
+        if (moveFlage) {
+          go(1024)
+          index--
+          highlightPoint()
+          moveFlage = false
+        } else {
+          return
+        }
+      }, false)
+
+      for (let i = 0, len = points.length; i < len; i++) {
+        let item = points[i]
+        item.addEventListener('click', ((item) => {
+          let pointIndex = parseInt(item.dataset.index)
+          return () => {
+            if (index !== pointIndex) {
+              go(pointIndex * -1024 - parseInt(content.style.left))
+              index = pointIndex
+              highlightPoint()
+            } else {
+              return
+            }
+          }
+        })(item), false)
+      }
+    }
+  </script>
+</body>
+</html>
