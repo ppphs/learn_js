@@ -1,0 +1,179 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta http-equiv="X-UA-Compatible" content="ie=edge">
+  <title>Document</title>
+</head>
+<body>
+  <script>
+    /* 一、原型链 */
+      // 利用原型链让一个引用类型继承另一个引用类型属性和方法
+      function SuperType () {
+        this.property = true
+      }
+
+      SuperType.prototype.getSuperValue = function () {
+        return this.property
+      }
+
+      function SubType () {
+        this.subProperty = false
+      }
+
+      SubType.prototype = new SuperType()
+
+      SubType.prototype.getSubValue = function () {
+        return this.subProperty
+      }
+
+      let instance = new SubType()
+      console.log(instance.getSubValue()) // false
+      console.log(instance.getSuperValue()) // true
+      consol1.log(instance.__proto__) // SuperType {...}
+      console.log(instance.constructor) // [Function: SuperType]
+      // 注意不能用对象字面量重写原型SubType.prototype = {...}
+      // 缺点：1、引用类型值的原型属性会被所有实例共享 2、不能像超类的构造函数传递参数
+    /* 原型链 */
+
+    /* 二、借用构造函数 */
+      function SuperType (name) {
+        this.name = name
+
+        this.colors = ['red', 'blue', 'yellow']
+      }
+
+      function SubType (name) {
+        SuperType.call(this, name)
+      }
+
+      let instance = new SubType('joe')
+      console.log(instance.name) // joe
+
+      instance.colors.push('black')
+      console/log(instance.colors) // ['red', 'blue', 'yellow', 'black']
+
+      let instance2 = new SubType()
+      console.log(instance2.colors) // ['red', 'blue', 'yellow']
+
+      //缺点：方法都在构造函数内部，无法复用
+    /* 借用构造函数 */
+
+    /* 三、组合模式 */
+      function SuperType (name) {
+        this.name = name
+
+        this.colors = ['red', 'blue', 'yellow']
+      }
+
+      SuperType.prototype.sayName = function () {
+        console.log(this.name)
+      }
+      
+      function SubType (name, age) {
+        SuperType.call(this, name)
+        this.age = age
+      }
+
+      SubType.prototype = new SuperType()
+      SubType.prototype.constructor = SubType
+      SubType.prototype.sayAge = function () {
+        console.log(this.age)
+      }
+
+      let instance = new SubType('joe', 20)
+      instance.colors.push('balck')
+      console.log(instance.colors) // ['red', 'blue', 'yellow', 'black']
+      instance.sayName() // joe
+      instance.sayAge() // 20
+
+      let instance2 = new SubType('other joe', 20)
+      console.log(instance.colors) // ['red', 'blue', 'yellow']
+      instance.sayName() // other joe
+      instance.sayAge() // 20
+
+      // 优点：通过在原型上定义方法实现函数复用，又能保证每个实例都有自己的属性
+    /* 组合模式 */
+
+    /* 四、原型式继承 */
+      // 作用等同于Object.create
+      function object (o) {
+        function F () {}
+        F.prototype = o
+        return new F()
+      }
+
+      let joe = {
+        name: 'joe',
+        friends: ['a', 'b', 'c']
+      }
+
+      let person1 = object(joe)
+      person1.name = 'a' // 改变不了joe里面的name
+      person1.friends.push('d')
+
+      let person2 = object(joe)
+      person1.name = 'b' // 改变不了joe里面的name
+      person1.friends.push('e')
+
+      console.log(joe, person1, person2) // {name: 'joe', friends: ['a', 'b', 'c', 'd', 'e']}  {name: 'a'}  {name: 'b'}
+
+      // 优点：没有复杂的构造函数，只想让一个对象与一个对象保持类型的情况下，原型式继承可以达到效果
+      // 缺点：包含引用类型的属性始终是共享的
+    /* 原型式继承 */
+
+    /* 五、寄生式继承 */
+      function createAnother (original) {
+        let clone = Object.create(original)
+        clone.sayHi = function () {
+          console.log('hi')
+        }
+        return clone
+      }
+
+      let joe = {
+        name: 'joe', 
+        friends: ['a', 'b', 'c']
+      }
+
+      let person = createAnother(joe)
+      person.sayHi()
+
+      // 优点：在主要考虑对象而不是自定义类型和构造函数的情况下，寄生式继承也是一种有用的模式
+      // 缺点：使用寄生式继承添加函数，不能做到共享复用性降低
+    /* 寄生式继承 */
+
+    /* 六、寄生组合式继承 */
+      function SuperType (name) {
+        this.name = name
+
+        this.colors = ['red', 'blue', 'yellow']
+      }
+
+      SuperType.prototype.sayName = function () {
+        console.log(this.name)
+      }
+      
+      function SubType (name, age) {
+        SuperType.call(this, name)
+        this.age = age
+      }
+
+      function inheritPrototype (subType, superType) {
+        let prototype = Object.create(superType)
+        prototype.constructor = subType
+        subType.prototype = prototype
+      }
+
+      inheritPrototype(SubType, SuperType)
+
+      SubType.prototype.sayAge = function () {
+        console.log(this.age)
+      }
+
+      // 优点：高效性，只调用了一次SuperType。避免了在SubType.prototype上创建不必要的多余的属性
+    /* 寄生组合式继承 */
+  </script>
+</body>
+</html>
