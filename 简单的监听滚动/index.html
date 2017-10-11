@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta http-equiv="X-UA-Compatible" content="ie=edge">
+  <title>Scroll</title>
+  <style>
+    html, body {
+      height: 150%;
+    }
+    body {
+      position: relative;
+    }
+    #demo {
+      position: absolute;
+      left: 50%;
+      top: 50%;
+      transform: translate(-50%, -50%);
+      width: 100px;
+      height: 100px;
+      background-color: rgb(35, 38, 46);
+    }
+  </style>
+</head>
+<body>
+  <div id="demo"></div>
+  <script>
+    /* window.scrollY: 返回文档在垂直方向已滚动的像素值。 */  
+    var windowHeight = document.documentElement.clientHeight; // 页面可视高度
+    var test = document.querySelector('#demo')
+    var testInfoObj = test.getBoundingClientRect(); // 获取元素元素的大小及其相对于视口的位置，一个DOMRect对象
+    window.onscroll = function() {
+      console.log(window.scrollY)
+      console.log(testInfoObj.top)
+      console.log(test.style.background)
+      if (window.scrollY > (testInfoObj.top - windowHeight)) {
+        test.style.background = 'lightblue'
+      }
+    }
+  </script>
+</body>
+</html>
