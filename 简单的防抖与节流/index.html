@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta http-equiv="X-UA-Compatible" content="ie=edge">
+  <title>Simple debounce and throttle</title>
+  <style>
+    html, body {
+      height: 150%
+    }
+  </style>
+</head>
+<body>
+  <script>
+    function debounce (fn, delay) {
+      let last
+      return function () {
+        let context = this, args = arguments
+        if (last) {
+          clearTimeout(last)
+        }
+        last = setTimeout(function () {
+          fn.apply(context, args)
+        }, delay)
+      }
+    }
+
+    function throttle (fn, delay) {
+      let last = 0
+      return function () {
+        let context = this, args = arguments, currentTime = + new Date()
+        if (currentTime - last > delay) {
+          fn.apply(context, args)
+          last = currentTime
+        }
+      }
+    }
+
+    // window.addEventListener('scroll', debounce(function () {
+    //   console.log('停止滚动后一秒显示此文字')
+    // }, 1000), false)
+
+    window.addEventListener('scroll', throttle(function () {
+      console.log('不停滚动的话每隔一秒才会打印一次次文字')
+    }, 1000), false)
+  </script>
+</body>
+</html>
