@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta http-equiv="X-UA-Compatible" content="ie=edge">
+  <title>Document</title>
+</head>
+<body>
+  <script>
+    console.log([] == []) // false 当两个值都是对象 (引用值) 时, 比较的是两个引用值在内存中是否是同一个对象. 因为此 [] 非彼 [], 虽然同为空数组, 确是两个互不相关的空数组, 自然 == 为 false
+    console.log([] == ![])
+    /*
+      true 
+      ![]返回false，==两边有布尔值就会把布尔值转化为数字于是就变成了[] == 0,
+      当"=="的一边是字符串或数字，另一边是对象的时候（数组也是对象），先把对象值转换为原始值再判断相等。对象值到原始值是怎么转换的呢?.对于所有非日期雷对象来说，对象到原始值的转换基本上就是对象到数字的转换。
+      有3个步骤：
+        1.所有对象先调用valueOf()方法，如果此方法返回的是原始值，则对象转为这个原始值。
+        2.如果valueOf方法返回的不是原始值，则调用toString方法，如果toString方法返回的是原始值吗，则对象转换为这个原始值。
+        3.如果valueOf和toString方法均没有返回原始值，则抛出TypeError异常
+      首先调用[].valueOf()方法，返回值是对象自身，即[]，这不是一个原始值。所以继续调用[].toString()方法，返回的是空字符串""，这是一个原始值，所以此值就作为对象转换为原始值的输出。于是问题就变成了求"" == 0.
+      当==两边一边是数字一边是字符串的时候就把字符串转化为数字进行比较所以[] == ![]返回true
+    */ 
+    console.log(+['1']) // 1
+    console.log(+['1', '2']) // NaN
+    console.log(+[[]]) // 0
+    console.log(+[['1']]) // 1
+
+    console.log(+{}) // NaN
+
+    // null 只在与undefined进行比较的时候会发生隐式类型转换
+    console.log(null == undefined) // true
+    console.log(+null) // 0
+    console.log('' == null) // false
+    console.log(false == null) // false
+
+    // NaN和谁都不相等，包括自身
+
+    // number
+    console.log(2 == true) // false 因为布尔值会转化为数字，true转化为1
+    console.log(1 == true) // true
+  </script>
+</body>
+</html>
