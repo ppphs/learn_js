@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta http-equiv="X-UA-Compatible" content="ie=edge">
+  <title>Document</title>
+</head>
+<body>
+  <script>
+    function deepClone(obj) {
+      var _toString = Object.prototype.toString
+
+      // null, undefined, 不是对象, function
+      if (!obj || typeof obj !== 'object') {
+        return obj
+      }
+
+      // DOM Node
+      if (obj.nodeType && 'cloneNode' in obj) {
+        return obj.cloneNode(true) // 克隆dom节点的方法
+      }
+
+      // Date
+      if (_toString.call(obj) === '[object Date]') {
+        return new Date(obj.getTime()) // 拷贝一个时间对象
+      }
+
+      // RegExp
+      if (_toString.call(obj) === '[object RegExp]') {
+        var flags = []
+        if (obj.global) { flags.push('g') }
+        if (obj.multiline) { flags.push('m') }
+        if (obj.ignoreCase) { flags.push('i') }
+
+        return new RegExp(obj.source, flags.join(''))
+      }
+
+      var result = Array.isArray(obj) ? [] :
+        obj.constructor ? new obj.constructor() : {} // 如果是数组就返回一个新的空数组，对象就返回一个新的空对象作为容器
+
+      for (var key in obj ) {
+        result[key] = deepClone(obj[key]) // 递归返回正确的值
+      }
+
+      return result
+    }
+
+    function A() {
+      this.a = a
+    }
+
+    var a = {
+      name: 'qiu',
+      birth: new Date(),
+      pattern: /qiu/gim,
+      container: document.body,
+      hobbys: ['book', new Date(), /aaa/gim, 111],
+      fn: function () {
+        console.log(1)
+      }
+    }
+
+    var c = new A()
+    var b = deepClone(c)
+    console.log(c.a === b.a) // false
+    console.log(c.a.hobbys === b.a.hobbys) // false
+    console.log(c.a.fn === b.a.fn) // true 函数的话这种方法不能实现深拷贝
+    console.log(c.a, b.a)
+  </script>
+</body>
+</html>
