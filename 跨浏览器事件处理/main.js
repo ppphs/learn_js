@@ -51,4 +51,8 @@ const EventUtil = {
  *  触发事件对象：
  *    1、w3c：e.target
  *    2、IE：e.srcElement
+ *
+ *  this:
+ *    1、w3c：this指向绑定事件的element
+ *    2、IE：指向window对象
  */
