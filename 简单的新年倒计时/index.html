@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta http-equiv="X-UA-Compatible" content="ie=edge">
+  <title>新年倒计时</title>
+</head>
+<body>
+  <p class="show"></p>
+  <script>
+    function getTimeString () {
+      let startObj = new Date(), year = startObj.getFullYear()
+
+      let start = +startObj, // 转化为时间戳
+        end = +new Date(year + 1, 0, 1), // 这里第一个参数是一个开始年份加一，第二个参数是月份（月份是从0开始的），第三个是日期
+        totalSeconds = Math.floor((end - start) / 1000) // 本来单位是毫秒转换成秒
+
+      let seconds = totalSeconds % 60, // 用分钟取余，余下的就是秒数位
+        minutes = Math.floor(totalSeconds / 60) % 60,
+        hours = Math.floor(totalSeconds / (60 * 60)) % 24,
+        days = Math.floor(totalSeconds / (60 * 60 * 24)) % 30, // 简化一下，假如每个月都是30天
+        months = Math.floor(totalSeconds / (60 * 60 * 24 * 30)) % 12
+
+      return `${year}年还剩${months}个月${days}天${hours}个小时${minutes}分钟${seconds}秒`
+    }
+
+    function writeText (element, text) {
+      if (!text) {
+        if (element.textContent) {
+          return element.textContent
+        } else if (element.innerText) {
+          return element.innerText
+        }
+      } else {
+        if (element.textContent) {
+          element.textContent = text
+        } else if (element.innerText) {
+          element.innerText = text
+        } else {
+          element.innerHTML = text
+        }
+      }
+    }
+
+    let show = document.querySelector('.show')
+    setInterval(function () {
+      writeText(show, getTimeString())
+    }, 1000)
+  </script>
+</body>
+</html>
