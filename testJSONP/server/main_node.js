@@ -35,8 +35,7 @@ app.get('/jsonp', (req, res) => {
 
 app.get('/gethtml', (req, res) => {
 
-  res.status(200).sendFile('D:/前端代码/testJSONP/server/test_send_html.html')
-  // res.status(200).sendFile('D:/前端代码/test1/gakki.jpg')
+  res.status(200).sendFile(path.join(__dirname, './test_send_html.html'))
 
 })
 
