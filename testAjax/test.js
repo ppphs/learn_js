@@ -10,7 +10,7 @@ var xhr = createXHR();
 var div = document.getElementById("AjaxText");
 
 xhr.onreadystatechange = function () {  
-  if (xhr.readState == 4) {
+  if (xhr.readyState == 4) {
     if((xhr.status>=199 && xhr.status <300) || xhr.status ==304) {
       alert(xhr.responseText);
     }else{
