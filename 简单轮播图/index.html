@@ -145,25 +145,28 @@
         return (dis) => { // 因为requestAnimationFrame传递给回调的是一个时间戳所以要用闭包保存一个目标距离
           if (distance === null) {
             distance = dis
-            newLeft = parseInt(content.style.left) + distance
+            newLeft = parseInt(content.style.left) + distance // 目标终点
             onceMove = distance / (totalTime / (1000 / 60)) // requestAnimationFrame 1秒调用60次，这里计算出一次移动的距离
           }
           let left = parseInt(content.style.left)
           let currentPosition = left + onceMove
           content.style.left = currentPosition + 'px'
-          if (distance < 0 && currentPosition > newLeft) {
+          if (distance === 0) {
+            return
+          }
+          if (distance < 0 && currentPosition > newLeft) { // 向右轮播
             window.requestAnimationFrame(go)
-          } else if (distance > 0 && currentPosition < newLeft) {
+          } else if (distance > 0 && currentPosition < newLeft) { // 向左轮播
             window.requestAnimationFrame(go)
           } else {
-            content.style.left = newLeft + 'px'
-            if (newLeft >= 0) {
+            content.style.left = newLeft + 'px' // 超过目标点就置为目标前
+            if (newLeft >= 0) { // 如果轮播到假的左边边界图就置为真实的最后一张图
               content.style.left = -4096 + 'px'
             } else if (newLeft <= -5120) {
               content.style.left = -1024 + 'px'
             }
             moveFlage = true
-            distance = null
+            distance = null // 轮播完毕把目标变量置null
             return
           }
         }
@@ -184,11 +187,15 @@
         points[index - 1].className = 'on'
       }
 
+      function move (dis) {
+        go(dis)
+        dis > 0 ? index-- : index++
+        highlightPoint()
+      }
+
       next.addEventListener('click', () => {
         if (moveFlage) {
-          go(-1024)
-          index++
-          highlightPoint()
+          move(-1024)
           moveFlage = false
         } else {
           return
@@ -197,36 +204,32 @@
 
       prev.addEventListener('click', () => {
         if (moveFlage) {
-          go(1024)
-          index--
-          highlightPoint()
+          move(1024)
           moveFlage = false
         } else {
           return
         }
       }, false)
 
-      for (let i = 0, len = points.length; i < len; i++) {
+      for (let i = 0, len = points.length; i < len; i++) { // 这里是let不会像var那样，这里的let会形成一个个闭包作用域
         let item = points[i]
-        item.addEventListener('click', ((item) => {
+        item.addEventListener('click', function () { // 给每个点绑定点击事件
+          console.log()
           let pointIndex = parseInt(item.dataset.index)
-          return () => {
-            if (index !== pointIndex) {
-              go(pointIndex * -1024 - parseInt(content.style.left))
-              index = pointIndex
-              highlightPoint()
-            } else {
-              return
-            }
+          if (index !== pointIndex) {
+            go(pointIndex * -1024 - parseInt(content.style.left))
+            index = pointIndex
+            highlightPoint()
+          } else {
+            return
           }
-        })(item), false)
+        }, false)
       }
 
-      intervalId = setInterval(() => {
-        go(-1024)
-        index++
-        highlightPoint()
-      }, 2000)
+      let autoFn = () => {
+        move(-1024)
+      }
+      intervalId = setInterval(autoFn, 2000)
       container.addEventListener('mouseenter', () => {
         window.clearInterval(intervalId)
       }, false)
@@ -234,18 +237,14 @@
         if (intervalId) { // 要清理上一次的定时器，去抖动
           window.clearInterval(intervalId)
         }
-        intervalId = setInterval(() => {
-          go(-1024)
-          index++
-          highlightPoint()
-        }, 2000)
+        intervalId = setInterval(autoFn, 2000)
       }, false)
 
       let skip_btn = document.querySelector('.skip_btn') // 修复当鼠标进入前进后退时还会自动播放
       skip_btn.addEventListener('mouseenter', () => {
         window.clearInterval(intervalId)
       }, false)
-      skip_btn.addEventListener('mouseout', (e) => {
+      skip_btn.addEventListener('mouseout', (e) => { // 防止移出后冒泡触发事件
         e.stopPropagation()
       }, false)
 
