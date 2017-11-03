@@ -19,11 +19,11 @@ app.get('/jsonp', (req, res) => {
 
   switch (callback) {
     case 'phs':
-      data = {name: '彭洪晟', loever: '姚淑婷'}
+      // data = {name: '彭洪晟', loever: '姚淑婷'}
       break
 
     case 'yst':
-      data = {name: '姚淑婷', loever: '彭洪晟'}
+      // data = {name: '姚淑婷', loever: '彭洪晟'}
       break
 
     default:
